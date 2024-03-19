@@ -1,10 +1,10 @@
 # README #
-### How to run Fast API server ###
 
-## Requirements ##
-- Python 3.x
-- FastAPI
-- uvicorn
+## Database
+- run a local PostgreSQL instance on your computer
+- create a new database 
+  - in psql: `CREATE DATABASE greenhouse;`
+- in `database.py` change **DATABASE_PASSWORD** to your password of the default user **postgres** 
 
 ## Installation ##
 1. Clone this repository and navigate to the directory:
@@ -28,6 +28,7 @@ pip install -r requirements.txt
 ```sh
 uvicorn main:app --port 3000 --reload
 ```
+
 
 ## Security Considerations ##
 
