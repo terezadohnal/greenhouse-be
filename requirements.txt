@@ -1,1 +1,3 @@
 fastapi
+python-jose[cryptography]
+passlib[bcrypt]
