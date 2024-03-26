@@ -171,10 +171,6 @@ async def read_own_items(
 ):
     return [{"item_id": "Foo", "owner": current_user.username}]
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
 
 @app.get("/users/", response_model=list[schemas.User])
 def read_users(db: Session = Depends(get_db)):
