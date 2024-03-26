@@ -70,13 +70,8 @@ class User(BaseModel):
 class UserInDB(User):
     hashed_password: str
 
-
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-app = FastAPI()
-
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
@@ -201,3 +196,9 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
+
+
+@app.get("/users/", response_model=list[schemas.User])
+def read_users(db: Session = Depends(get_db)):
+    users = crud.get_users(db)
+    return users
