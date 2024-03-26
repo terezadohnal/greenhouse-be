@@ -1,10 +1,14 @@
 # README #
 
 ## Database
-- run a local PostgreSQL instance on your computer
-- create a new database 
-  - in psql: `CREATE DATABASE greenhouse;`
-- in `database.py` change **DATABASE_PASSWORD** to your password of the default user **postgres** 
+1. **run a local PostgreSQL instance on your computer**
+   - if you have postgresql already installed on your computer, go to step 2
+   - install PostgreSQL on your computer https://www.postgresql.org/download/
+   - OR run PostgreSQL in docker `docker run --rm --name postgres -p 5433:5432 -e POSTGRES_PASSWORD=123 postgres`
+      - the command is not tested you may need to change it slightly
+2. **create a new database**
+   - in psql: `CREATE DATABASE greenhouse;`
+3. in `database.py` change **DATABASE_PASSWORD** to your password of the default user **postgres** 
 
 ## Installation ##
 1. Clone this repository and navigate to the directory:
