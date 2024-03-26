@@ -22,17 +22,10 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 fake_users_db = {
     "johndoe": {
         "username": "johndoe",
-        "first_name": "John",
-        "last_name": "Doe",
+        "full_name": "John Doe",
         "email": "johndoe@example.com",
         "hashed_password": "$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW",
-    },
-    "test": {
-        "username": "test",
-        "email": "test@test.test",
-        "first_name": "test",
-        "last_name": "test",
-        "hashed_password": "$2b$12$SjWiTDCzNgsoQMHLTeeaCefxruW8qXwLKRuExusKA96yUL8ooDsKe",
+        "disabled": False,
     }
 }
 
@@ -50,6 +43,7 @@ class User(BaseModel):
     username: str
     email: Union[str, None] = None
     full_name: Union[str, None] = None
+    disabled: Union[bool, None] = None
 
 
 class UserInDB(User):
@@ -58,7 +52,7 @@ class UserInDB(User):
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 app = FastAPI()
 
@@ -70,24 +64,6 @@ def verify_password(plain_password, hashed_password):
 async def get_hashed_pass(user_password: str):
     hashed_pass = get_password_hash(user_password)
     return {"hashed_password": hashed_pass}
-
-
-@app.post("/register/")
-async def register(username: str, password: str, email: str, first_name: str, last_name: str):
-    try:
-        hashed_pass = get_password_hash(password)
-        user = {
-            "username": username,
-            "email": email,
-            "first_name": first_name,
-            "last_name": last_name,
-            "hashed_password": hashed_pass,
-        }
-
-        return {"user": user, "status": 201}
-    except Exception as e:
-        return {"error": str(e), "status": 400}
-
 
 
 def get_password_hash(password):
@@ -143,7 +119,8 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
 async def get_current_active_user(
     current_user: Annotated[User, Depends(get_current_user)]
 ):
-
+    if current_user.disabled:
+        raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
 
 
