@@ -3,12 +3,13 @@
 ## Database
 1. **run a local PostgreSQL instance on your computer**
    - if you have postgresql already installed on your computer, go to step 2
-   - install PostgreSQL on your computer https://www.postgresql.org/download/
+   - install PostgreSQL on your computer [link](https://www.postgresql.org/download/) and go to step 2
    - OR run PostgreSQL in docker `docker run --rm --name postgres -p 5433:5432 -e POSTGRES_PASSWORD=123 postgres`
-      - the command is not tested you may need to change it slightly
+      - you may need to change the command a bit
+      - then you need to add port to database.py after `localhost`, e.g. `localhost:5433`
 2. **create a new database**
-   - in psql: `CREATE DATABASE greenhouse;`
-3. in `database.py` change **DATABASE_PASSWORD** to your password of the default user **postgres** 
+   - in psql console: `CREATE DATABASE greenhouse;`
+3. in `database.py` change **DATABASE_PASSWORD** to your password of the user **postgres** 
 
 ## Installation ##
 1. Clone this repository and navigate to the directory:
