@@ -62,7 +62,7 @@ async def login_for_access_token(
     return user_model.Token(access_token=access_token, token_type="bearer")
 
 @user_api_router.get("/users/", response_model=list[schemas.User])
-def read_users(db: Session = Depends(get_db)):
+def read_users(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
     users = user_crud.get_users(db)
     return users
 
