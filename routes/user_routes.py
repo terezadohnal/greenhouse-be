@@ -9,10 +9,12 @@ from models import user_model
 from routes import user_crud
 from database import SessionLocal
 from fastapi import Depends, HTTPException
+import os
 
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+from dotenv import load_dotenv
 
 user_api_router = APIRouter()
 
@@ -20,11 +22,11 @@ user_api_router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
-# to get a string like this run:
-# openssl rand -hex 32
-SECRET_KEY = "0d0be28f03ab10c4419e528e138d7495ae7f1c4ba8b00116d275361c35824783"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+load_dotenv()
+
+SECRET_KEY = os.environ.get('SECRET_KEY')
+ALGORITHM = os.environ.get('ALGORITHM')
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.environ.get('ACCESS_TOKEN_EXPIRE_MINUTES'))
 
 
 # Dependency

@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-
+import os
 import schemas
 from models import user_model
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -8,19 +8,21 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
 from typing import Annotated, Union
 from fastapi import Depends, FastAPI, HTTPException, status
-
-
+from dotenv import load_dotenv
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
+load_dotenv()
 
-# to get a string like this run:
-# openssl rand -hex 32
-SECRET_KEY = "0d0be28f03ab10c4419e528e138d7495ae7f1c4ba8b00116d275361c35824783"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+SECRET_KEY = os.environ.get('SECRET_KEY')
+ALGORITHM = os.environ.get('ALGORITHM')
+ACCESS_TOKEN_EXPIRE_MINUTES = os.environ.get('ACCESS_TOKEN_EXPIRE_MINUTES')
+
+print(SECRET_KEY)
+print(ALGORITHM)
+print(ACCESS_TOKEN_EXPIRE_MINUTES)
 
 def get_user(db: Session, user_id: int):
     return db.query(user_model.User).filter(user_model.User.id == user_id).first()
