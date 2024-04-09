@@ -56,7 +56,7 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
 
 def create_user(db: Session, user: schemas.UserCreate):
     hashed_password = get_password_hash(user.password)
-    db_user = user_model.User(email=user.email, hashed_password=hashed_password, username=user.username, fullname=user.fullname)
+    db_user = user_model.User(email=user.email, hashed_password=hashed_password, username=user.username, first_name=user.first_name, last_name=user.last_name)
     print(db_user.hashed_password)
     db.add(db_user)
     db.commit()
