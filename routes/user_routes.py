@@ -38,7 +38,7 @@ def get_db():
         db.close()
 
 
-@user_api_router.post("/register/", response_model=schemas.User)
+@user_api_router.post("users/register/", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = user_crud.get_user_by_email(db, email=user.email)
     if db_user:
@@ -46,7 +46,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return user_crud.create_user(db=db, user=user)
 
 
-@user_api_router.post("/login/")
+@user_api_router.post("users/login/")
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)
 ) -> user_model.Token:
@@ -63,6 +63,7 @@ async def login_for_access_token(
     )
     return user_model.Token(access_token=access_token, token_type="bearer")
 
+
 @user_api_router.get("/users/", response_model=list[schemas.User])
 def read_users(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
     users = user_crud.get_users(db)
@@ -76,7 +77,15 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
 
-@user_api_router.post("/hash-password/")
+
+@user_api_router.put("/users/{user_id}", response_model=schemas.User)
+def read_user(user_id: int, db: Session = Depends(get_db)):
+    db_user = user_crud.get_user(db, user_id=user_id)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return db_user
+
+@user_api_router.post("users/hash-password/")
 async def get_hashed_pass(user_password: str):
     hashed_pass = user_crud.get_password_hash(user_password)
     return {"hashed_password": hashed_pass}
