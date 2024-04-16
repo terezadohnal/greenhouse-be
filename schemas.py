@@ -18,3 +18,16 @@ class User(UserBase):
 
     class Config:
         from_attributes = True
+
+class CameraBase(BaseModel):
+    camera_name: str
+    sampling_frequency: int
+    images_count: int
+    camera_activation: int
+    measurement_duration: int
+
+class Camera(CameraBase):
+    id: int
+
+    class Config:
+        from_attributes = True

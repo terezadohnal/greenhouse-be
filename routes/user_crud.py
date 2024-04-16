@@ -2,12 +2,12 @@ from sqlalchemy.orm import Session
 import os
 import schemas
 from models import user_model
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
 from typing import Annotated, Union
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, HTTPException, status
 from dotenv import load_dotenv
 
 
@@ -19,10 +19,6 @@ load_dotenv()
 SECRET_KEY = os.environ.get('SECRET_KEY')
 ALGORITHM = os.environ.get('ALGORITHM')
 ACCESS_TOKEN_EXPIRE_MINUTES = os.environ.get('ACCESS_TOKEN_EXPIRE_MINUTES')
-
-print(SECRET_KEY)
-print(ALGORITHM)
-print(ACCESS_TOKEN_EXPIRE_MINUTES)
 
 def get_user(db: Session, user_id: int):
     return db.query(user_model.User).filter(user_model.User.id == user_id).first()
@@ -57,7 +53,6 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
 def create_user(db: Session, user: schemas.UserCreate):
     hashed_password = get_password_hash(user.password)
     db_user = user_model.User(email=user.email, hashed_password=hashed_password, username=user.username, first_name=user.first_name, last_name=user.last_name)
-    print(db_user.hashed_password)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
