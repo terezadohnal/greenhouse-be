@@ -1,8 +1,7 @@
 # SQL ALCHEMY MODELS
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String
 from pydantic import BaseModel
-from typing import Annotated, Union
+from typing import  Union
 
 
 from database import Base
