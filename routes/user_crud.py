@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 import os
-import schemas
-from models import user_model
+from schemas import Role, UserCreate
+from models.user_model import User, TokenData
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -24,19 +24,21 @@ print(SECRET_KEY)
 print(ALGORITHM)
 print(ACCESS_TOKEN_EXPIRE_MINUTES)
 
+
 def get_user(db: Session, user_id: int):
-    return db.query(user_model.User).filter(user_model.User.id == user_id).first()
+    return db.query(User).filter(User.id == user_id).first()
 
 
 def get_user_by_email(db: Session, email: str):
-    return db.query(user_model.User).filter(user_model.User.email == email).first()
+    return db.query(User).filter(User.email == email).first()
+
 
 def get_user_by_username(db: Session, username: str):
-    return db.query(user_model.User).filter(user_model.User.username == username).first()
+    return db.query(User).filter(User.username == username).first()
 
 
 def get_users(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(user_model.User).offset(skip).limit(limit).all()
+    return db.query(User).offset(skip).limit(limit).all()
 
 
 def get_password_hash(password):
@@ -54,9 +56,16 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     return encoded_jwt
 
 
-def create_user(db: Session, user: schemas.UserCreate):
+def create_user(db: Session, user: UserCreate):
     hashed_password = get_password_hash(user.password)
-    db_user = user_model.User(email=user.email, hashed_password=hashed_password, username=user.username, first_name=user.first_name, last_name=user.last_name)
+    db_user = User(
+        email=user.email,
+        hashed_password=hashed_password,
+        username=user.username,
+        first_name=user.first_name,
+        last_name=user.last_name,
+        role=Role.user.value
+    )
     print(db_user.hashed_password)
     db.add(db_user)
     db.commit()
@@ -76,6 +85,7 @@ def authenticate_user(db: Session, username: str, password: str):
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
+
 async def get_current_user(db: Session, token: Annotated[str, Depends(oauth2_scheme)]):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -87,7 +97,7 @@ async def get_current_user(db: Session, token: Annotated[str, Depends(oauth2_sch
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
-        token_data = user_model.TokenData(username=username)
+        token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
     user = get_user(db, username=token_data.username)
@@ -95,8 +105,9 @@ async def get_current_user(db: Session, token: Annotated[str, Depends(oauth2_sch
         raise credentials_exception
     return user
 
+
 async def get_current_active_user(
-    current_user: Annotated[user_model.User, Depends(get_current_user)]
+    current_user: Annotated[User, Depends(get_current_user)]
 ):
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
