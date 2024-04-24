@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, status
-from typing import Annotated, Union
+from typing import Annotated
 
-from datetime import datetime, timedelta, timezone
+from datetime import  timedelta
 
 import schemas
 from models import user_model
@@ -12,7 +12,6 @@ from fastapi import Depends, HTTPException
 import os
 
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jose import JWTError, jwt
 from passlib.context import CryptContext
 from dotenv import load_dotenv
 
