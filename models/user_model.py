@@ -1,7 +1,7 @@
-# SQL ALCHEMY MODELS
+# DATABASE MODELS
 from sqlalchemy import Column, Integer, String
 from pydantic import BaseModel
-from typing import  Union
+from typing import Union
 
 
 from database import Base
@@ -16,6 +16,7 @@ class User(Base):
     last_name = Column(String)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
+    role = Column(String, default="user")
 
 
 class Token(BaseModel):

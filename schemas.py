@@ -1,5 +1,12 @@
 # PYDANTIC SCHEMAS (MODELS)
+from enum import Enum
+
 from pydantic import BaseModel
+
+
+class Role(Enum):
+    user = 'user'
+    admin = 'admin'
 
 
 class UserBase(BaseModel):
@@ -15,6 +22,7 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: int
+    role: Role
 
     class Config:
         from_attributes = True
