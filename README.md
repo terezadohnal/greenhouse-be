@@ -34,6 +34,9 @@ pip install -r requirements.txt
 uvicorn main:app --port 3000 --reload
 ```
 
+- if you don't use virtual environment:
+python -m uvicorn main:app --port 3000 --reload
+
 
 ## Security Considerations ##
 

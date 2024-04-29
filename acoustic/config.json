@@ -1,0 +1,15 @@
+{
+    "rpc": {
+        "url":"ws://localhost:40999",
+
+        "options": {
+            "reconnect": false,
+            "reconnect_interval":1000,
+            "max_reconnects": 10
+        }
+    },
+
+    "debug": {
+        "log_verbosity": 2
+    }
+}

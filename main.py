@@ -6,11 +6,13 @@ from models import user_model
 from database import  engine
 from routes.user_routes import user_api_router
 from routes.camera_routes import camera_api_router
+from routes.acoustic_routes import acoustic_router
 
 user_model.Base.metadata.create_all(bind=engine)
 app = FastAPI()
 app.include_router(user_api_router)
 app.include_router(camera_api_router)
+app.include_router(acoustic_router)
 
 origins = ["*"]
 
