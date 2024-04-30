@@ -44,18 +44,21 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Email already registered")
     return user_crud.create_user(db=db, user=user)
 
+
 @user_api_router.put("/edit/{user_id}", response_model=schemas.User)
-def edit_user(user: schemas.UserCreate, user_id: int, db: Session = Depends(get_db)):
-
-    db_user = user_crud.get_user_by_email(db, email=user.email)
-    if db_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-
+def edit_user(user: schemas.UserUpdate, user_id: int, db: Session = Depends(get_db)):
     db_user = user_crud.edit_user(user_id, user, db=db)
     if db_user:
         return db_user
     else:
         raise HTTPException(status_code=404, detail="User not found")
+
+
+@user_api_router.put("/password-reset/{user_id}", status_code=202)
+def reset_password(user_id: int, body: schemas.UserPasswordReset, db: Session = Depends(get_db)):
+    db_user = user_crud.reset_password(user_id, body.new_password, db=db)
+    return "Password updated successfuly."
+
 
 @user_api_router.post("/login/")
 async def login_for_access_token(
