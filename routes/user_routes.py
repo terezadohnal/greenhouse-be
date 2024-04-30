@@ -71,11 +71,11 @@ async def login_for_access_token(
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = user_crud.create_access_token(
         data={
-            "username": user.username,
-            "firstName": user.first_name,
-            "lastName": user.last_name,
-            "email": user.email,
-            "role": user.role
+            "username": user['username'],
+            "firstName": user['first_name'],
+            "lastName": user['last_name'],
+            "email": user['email'],
+            "role": user['role']
         },
         expires_delta=access_token_expires
     )
