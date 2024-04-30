@@ -39,10 +39,10 @@ def Start_recording():
 def Pause_recording():
     if not ZedoClient.Is_connected():
         ZedoClient.Connect()
-    return ZedoClient.PauseRecording("test")
+    return ZedoClient.PauseRecording()
 
 @acoustic_router.post("/acoustic/stop_rec")
 def Stop_recording():
     if not ZedoClient.Is_connected():
         ZedoClient.Connect()
-    return ZedoClient.StopRecording("test")
+    return ZedoClient.StopRecording()

@@ -223,19 +223,5 @@ class ZedoRPC:
 
 # Příklad použití třídy
 if __name__ == "__main__":
-    client = SensorController("127.0.0.1", 40999)
-    client.Connect()
-    # tst = client.StartRecording("Pok")
-    # time.sleep(3)
-    # client.StopRecording()
-    folder_name = client.Generate_rec_folder_name()
-    res = client.OpenFileReaderByName()
-    # res = client.OpenFileReaderByPath()
+    print("# Přepis zedo-rpc pro python (nekompletní)\n# Author: David Michalica Team 1, Matěj Prášil Team 2\n# Documentation: https://bitbucket.org/dakel/node-zedo-rpc/src/master/API.md\n# Date: 29.04.2024 MP v0.2")
     
-    data = json.loads(res)
-    response = data['result']
-    fileid = response['_id'] 
-    response_string = client.GetFileReaderData(fileid)
-
-    # Vypsání odpovědi
-    print("Response from server:", response_string)
