@@ -11,6 +11,8 @@ from datetime import datetime, timedelta, timezone
 from typing import Annotated, Union
 from fastapi import Depends, HTTPException, status
 from dotenv import load_dotenv
+from fastapi.encoders import jsonable_encoder
+
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -22,20 +24,28 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 ALGORITHM = os.environ.get('ALGORITHM')
 ACCESS_TOKEN_EXPIRE_MINUTES = os.environ.get('ACCESS_TOKEN_EXPIRE_MINUTES')
 
+from fastapi.encoders import jsonable_encoder
+
+
 def get_user(db: Session, user_id: int):
-    return db.query(User).filter(User.id == user_id).first()
+    user = db.query(user_model.User).filter(user_model.User.id == user_id).first()
+    return jsonable_encoder(user) if user else None
 
 
 def get_user_by_email(db: Session, email: str):
-    return db.query(User).filter(User.email == email).first()
+    user = db.query(user_model.User).filter(user_model.User.email == email).first()
+    return jsonable_encoder(user) if user else None
 
 
 def get_user_by_username(db: Session, username: str):
-    return db.query(User).filter(User.username == username).first()
+    user = db.query(user_model.User).filter(user_model.User.username == username).first()
+    return jsonable_encoder(user) if user else None
+
 
 
 def get_users(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(User).offset(skip).limit(limit).all()
+    users = db.query(user_model.User).offset(skip).limit(limit).all()
+    return [jsonable_encoder(user) for user in users]
 
 
 def get_password_hash(password):
@@ -69,7 +79,47 @@ def create_user(db: Session, user: UserCreate):
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
-    return db_user
+    return jsonable_encoder(db_user)
+
+
+def edit_user(user_id: int, user: schemas.UserCreate, db: Session):
+    # Retrieve the user from the database
+    db_user = db.query(user_model.User).filter(user_model.User.id == user_id).first()
+
+    # Check if the user exists
+    if db_user:
+        # Update the user's properties with the new data
+        db_user.email = user.email
+        db_user.username = user.username
+        db_user.first_name = user.first_name
+        db_user.last_name = user.last_name
+
+        # If a new password is provided, hash it and update the hashed password
+        if user.password:
+            hashed_password = get_password_hash(user.password)
+            db_user.hashed_password = hashed_password
+
+        # Commit the changes to the database
+        db.commit()
+
+        # Refresh the db_user to reflect the changes made in the database
+        db.refresh(db_user)
+
+        updated_user = {
+            "id": db_user.id,
+            "email": db_user.email,
+            "username": db_user.username,
+            "first_name": db_user.first_name,
+            "last_name": db_user.last_name
+        }
+
+        print(updated_user)
+
+        # Return the updated user as a dictionary
+        return updated_user
+    else:
+        # Handle the case where the user with the given ID does not exist
+        return None
 
 
 def authenticate_user(db: Session, username: str, password: str):

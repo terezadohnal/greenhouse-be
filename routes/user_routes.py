@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, status
-from typing import Annotated
+from typing import Annotated, List
 
 from datetime import timedelta
 
@@ -44,6 +44,18 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Email already registered")
     return user_crud.create_user(db=db, user=user)
 
+@user_api_router.put("/edit/{user_id}", response_model=schemas.User)
+def edit_user(user: schemas.UserCreate, user_id: int, db: Session = Depends(get_db)):
+
+    db_user = user_crud.get_user_by_email(db, email=user.email)
+    if db_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+
+    db_user = user_crud.edit_user(user_id, user, db=db)
+    if db_user:
+        return db_user
+    else:
+        raise HTTPException(status_code=404, detail="User not found")
 
 @user_api_router.post("/login/")
 async def login_for_access_token(
@@ -70,7 +82,7 @@ async def login_for_access_token(
     return user_model.Token(access_token=access_token, token_type="bearer")
 
 
-@user_api_router.get("/users/", response_model=list[schemas.User])
+@user_api_router.get("/users/", response_model=List[schemas.User])
 def read_users(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
     users = user_crud.get_users(db)
     return users
