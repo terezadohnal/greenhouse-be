@@ -46,3 +46,9 @@ def Stop_recording():
     if not ZedoClient.Is_connected():
         ZedoClient.Connect()
     return ZedoClient.StopRecording()
+
+@acoustic_router.post("/acoustic/export_data")
+def Export_data():
+    if not ZedoClient.Is_connected():
+        ZedoClient.Connect()
+    return ZedoClient.ExportData("2024-04-27")

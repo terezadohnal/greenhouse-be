@@ -9,14 +9,43 @@ import socket
 import json
 import os
 
-class ZedoRPC: 
-    def __init__(self, ip="127.0.0.1", port=40999):
-        self.IP_ADDR = ip
-        self.PORT = port
+class ZedoRPC:
+    
+    #############
+    ## Constants
+    
+    DEFAULT_DIR_PATH = "C:\ZEDO_Data"
+    
+    EXPORT_CFG = {
+        "export": {
+            "allow": ["r_siginfo", "r_hitdet0", "r_sigsmp", "r_fastrms"],
+            "mode": 2,  # Export mode: 0=do nothing, validate config only, 1=show export dialog, 2=start background export job. Default:0.
+        },
+        "time": {
+            "base": 0,          # Time base for relative time calculation. One of the following
+                                #   - 0 ... time is relative to FileReader base time (Default)
+                                #   - 1 ... relative to the first point ever seen
+                                #   - Number ... specific JavaScript time is used as a base time
+            "time_format": 0,   # Time format. 0=default relative time in seconds,  1=nanosecond integer time. Default:0
+            "date_format": 1,   # Absolute time/date format. 0=not exported, 1=Date/Time, 2=Time only. Default:0
+        },
+        "siginfo": {
+            "voltage_format": 5,    # AE voltage in Volts: 0=not exported, 1=(int)nV, 2=(int)uV, 3=(float)uV, 4=(float)mV, 5=(float)V. Default=5.
+            "voltage_dbae": 1,      # AE voltage in dBAE: 0=not exported, 1=exported. Default=0.
+            "counts_log": 1,        # AE counts in logarithmic units: 0=not exported, 1=exported. Default=1.
+            "counts_lin": 1,        # AE counts in linear units: 0=not exported, 1=exported. Default=0.
+            "energy_format": 1,     # AE energy units: 0=V^2/Hz, 1=uV^2/Hz. Default=1.
+        },
+    }
+    
+    #############
+    ## Methods  
+    
+    def __init__(self):
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    def Connect(self):
-        self.client_socket.connect((self.IP_ADDR, self.PORT))
+    def Connect(self, ip="127.0.0.1", port=40999):
+        self.client_socket.connect((ip, port))
         
     def Disconnect(self):
         self.client_socket.close()
@@ -220,7 +249,21 @@ class ZedoRPC:
 
     def GetSubItems(self):
         return self.Call("GetSubItems")
-
+    
+    def ExportData(self, Reader_name, dir = DEFAULT_DIR_PATH):
+        readerRespnse = self.OpenFileReaderByName("Reader_name")
+        if os.path.isdir(dir):
+            if self.Is_zdat_directory(dir):
+                data = json.loads(readerRespnse)
+                # response = data['result']
+                reader_id = data['_id'] 
+                self.SetFileReaderPath(reader_id, dir, False)
+        # else:
+            # Běžný adresář - rekurze do všech podadresářů
+            # files = os.listdir(dir)
+            # for file in files:
+            #     process_directory(reader_id, os.path.join(dir, file))
+            
 # Příklad použití třídy
 if __name__ == "__main__":
     print("# Přepis zedo-rpc pro python (nekompletní)\n# Author: David Michalica Team 1, Matěj Prášil Team 2\n# Documentation: https://bitbucket.org/dakel/node-zedo-rpc/src/master/API.md\n# Date: 29.04.2024 MP v0.2")
