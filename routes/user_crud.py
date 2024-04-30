@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 import os
 
-from schemas import Role, UserCreate
+from schemas import Role, UserCreate, UserUpdate
 from models.user_model import User, TokenData
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
@@ -82,7 +82,7 @@ def create_user(db: Session, user: UserCreate):
     return jsonable_encoder(db_user)
 
 
-def edit_user(user_id: int, user: UserCreate, db: Session):
+def edit_user(user_id: int, user: UserUpdate, db: Session):
     # Retrieve the user from the database
     db_user = db.query(User).filter(User.id == user_id).first()
 
@@ -93,11 +93,7 @@ def edit_user(user_id: int, user: UserCreate, db: Session):
         db_user.username = user.username
         db_user.first_name = user.first_name
         db_user.last_name = user.last_name
-
-        # If a new password is provided, hash it and update the hashed password
-        if user.password:
-            hashed_password = get_password_hash(user.password)
-            db_user.hashed_password = hashed_password
+        db_user.role = user.role.value
 
         # Commit the changes to the database
         db.commit()
@@ -110,16 +106,46 @@ def edit_user(user_id: int, user: UserCreate, db: Session):
             "email": db_user.email,
             "username": db_user.username,
             "first_name": db_user.first_name,
-            "last_name": db_user.last_name
+            "last_name": db_user.last_name,
+            "role": db_user.role
         }
-
-        print(updated_user)
 
         # Return the updated user as a dictionary
         return updated_user
     else:
         # Handle the case where the user with the given ID does not exist
         return None
+
+
+def reset_password(user_id: int, new_password: str, db: Session):
+    # Retrieve the user from the database
+    db_user = db.query(User).filter(User.id == user_id).first()
+
+    # Check if the user exists
+    if db_user:
+        # Update the user's password with the new password
+        db_user.hashed_password = get_password_hash(new_password)
+
+        # Commit the changes to the database
+        db.commit()
+
+        # Refresh the db_user to reflect the changes made in the database
+        db.refresh(db_user)
+
+        updated_user = {
+            "id": db_user.id,
+            "email": db_user.email,
+            "username": db_user.username,
+            "first_name": db_user.first_name,
+            "last_name": db_user.last_name,
+            "role": db_user.role
+        }
+
+        # Return the updated user as a dictionary
+        return updated_user
+    else:
+        # Handle the case where the user with the given ID does not exist
+        raise HTTPException(status_code=404, detail="User not found")
 
 
 def authenticate_user(db: Session, username: str, password: str):

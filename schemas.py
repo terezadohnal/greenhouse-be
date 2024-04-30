@@ -20,12 +20,21 @@ class UserCreate(UserBase):
     password: str
 
 
+class UserUpdate(UserBase):
+    role: Role
+
+
 class User(UserBase):
     id: int
     role: Role
 
     class Config:
         from_attributes = True
+
+
+class UserPasswordReset(BaseModel):
+    new_password: str
+
 
 class CameraBase(BaseModel):
     camera_name: str
