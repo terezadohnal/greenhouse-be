@@ -22,33 +22,33 @@ def get_db():
         db.close()
         
 @acoustic_router.post("/acoustic/connect")
-def Connect():
+def Connect(token: Annotated[str, Depends(oauth2_scheme)]):
     return ZedoClient.Connect()
 
 @acoustic_router.post("/acoustic/disconnect")
-def Disconnect():
+def Disconnect(token: Annotated[str, Depends(oauth2_scheme)]):
     return ZedoClient.Disconnect()
 
 @acoustic_router.post("/acoustic/start_rec")
-def Start_recording():
+def Start_recording(token: Annotated[str, Depends(oauth2_scheme)]):
     if not ZedoClient.Is_connected():
         ZedoClient.Connect()
     return ZedoClient.StartRecording("test")
 
 @acoustic_router.post("/acoustic/pause_rec")
-def Pause_recording():
+def Pause_recording(token: Annotated[str, Depends(oauth2_scheme)]):
     if not ZedoClient.Is_connected():
         ZedoClient.Connect()
     return ZedoClient.PauseRecording()
 
 @acoustic_router.post("/acoustic/stop_rec")
-def Stop_recording():
+def Stop_recording(token: Annotated[str, Depends(oauth2_scheme)]):
     if not ZedoClient.Is_connected():
         ZedoClient.Connect()
     return ZedoClient.StopRecording()
 
 @acoustic_router.post("/acoustic/export_data")
-def Export_data():
+def Export_data(token: Annotated[str, Depends(oauth2_scheme)]):
     if not ZedoClient.Is_connected():
         ZedoClient.Connect()
     return ZedoClient.ExportData("2024-04-27")
