@@ -2,10 +2,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-DATABASE_PASSWORD = ''
-SQLALCHEMY_DATABASE_URL = f'postgresql://postgres:{DATABASE_PASSWORD}@localhost/greenhouse'
+DATABASE_PASSWORD = 'password'
+SQLALCHEMY_DATABASE_URL = f'postgresql://default:fbcIm5DQ8lOu@ep-rough-mouse-a29jwiy8.eu-central-1.aws.neon.tech:5432/verceldb?sslmode=require'
 DATABASE_NAME = 'greenhouse'
-SQLALCHEMY_DATABASE_URL = f'postgresql://postgres:{DATABASE_PASSWORD}@localhost/{DATABASE_NAME}'
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
