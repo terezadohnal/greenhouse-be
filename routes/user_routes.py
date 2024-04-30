@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import APIRouter, status
 from typing import Annotated
 
-from datetime import  timedelta
+from datetime import timedelta
 
 import schemas
 from models import user_model
@@ -47,7 +47,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 @user_api_router.post("/login/")
 async def login_for_access_token(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)
+        form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)
 ) -> user_model.Token:
     user = user_crud.authenticate_user(db, form_data.username, form_data.password)
     if not user:
@@ -58,9 +58,17 @@ async def login_for_access_token(
         )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = user_crud.create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
+        data={
+            "username": user.username,
+            "firstName": user.first_name,
+            "lastName": user.last_name,
+            "email": user.email,
+            "role": user.role
+        },
+        expires_delta=access_token_expires
     )
     return user_model.Token(access_token=access_token, token_type="bearer")
+
 
 @user_api_router.get("/users/", response_model=list[schemas.User])
 def read_users(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
@@ -75,8 +83,8 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
 
+
 @user_api_router.post("/hash-password/")
 async def get_hashed_pass(user_password: str):
     hashed_pass = user_crud.get_password_hash(user_password)
     return {"hashed_password": hashed_pass}
-
