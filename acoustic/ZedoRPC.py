@@ -8,6 +8,7 @@
 import socket
 import json
 import os
+from fastapi.responses import JSONResponse
 
 class ZedoRPC:
     
@@ -45,8 +46,13 @@ class ZedoRPC:
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     def Connect(self, ip="127.0.0.1", port=40999):
-        self.client_socket.connect((ip, port))
-        
+        try:
+            self.client_socket.connect((ip, port))
+        except ConnectionRefusedError:
+            error_message = "Connection refused"
+            error_code = 523 # You can define your own error codes
+            return JSONResponse(content=error_message, status_code=error_code)
+
     def Disconnect(self):
         self.client_socket.close()
         
