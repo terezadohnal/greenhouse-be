@@ -28,23 +28,23 @@ from fastapi.encoders import jsonable_encoder
 
 
 def get_user(db: Session, user_id: int):
-    user = db.query(user_model.User).filter(user_model.User.id == user_id).first()
+    user = db.query(User).filter(User.id == user_id).first()
     return jsonable_encoder(user) if user else None
 
 
 def get_user_by_email(db: Session, email: str):
-    user = db.query(user_model.User).filter(user_model.User.email == email).first()
+    user = db.query(User).filter(User.email == email).first()
     return jsonable_encoder(user) if user else None
 
 
 def get_user_by_username(db: Session, username: str):
-    user = db.query(user_model.User).filter(user_model.User.username == username).first()
+    user = db.query(User).filter(User.username == username).first()
     return jsonable_encoder(user) if user else None
 
 
 
 def get_users(db: Session, skip: int = 0, limit: int = 100):
-    users = db.query(user_model.User).offset(skip).limit(limit).all()
+    users = db.query(User).offset(skip).limit(limit).all()
     return [jsonable_encoder(user) for user in users]
 
 
@@ -82,9 +82,9 @@ def create_user(db: Session, user: UserCreate):
     return jsonable_encoder(db_user)
 
 
-def edit_user(user_id: int, user: schemas.UserCreate, db: Session):
+def edit_user(user_id: int, user: UserCreate, db: Session):
     # Retrieve the user from the database
-    db_user = db.query(user_model.User).filter(user_model.User.id == user_id).first()
+    db_user = db.query(User).filter(User.id == user_id).first()
 
     # Check if the user exists
     if db_user:
@@ -126,7 +126,7 @@ def authenticate_user(db: Session, username: str, password: str):
     user = get_user_by_username(db, username)
     if not user:
         return False
-    if not verify_password(password, user.hashed_password):
+    if not verify_password(password, user['hashed_password']):
         return False
     return user
 
