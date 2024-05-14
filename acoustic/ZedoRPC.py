@@ -9,13 +9,18 @@ import socket
 import json
 import os
 from fastapi.responses import JSONResponse
+from datetime import datetime
 
 class ZedoRPC:
     
     #############
     ## Constants
     
-    DEFAULT_DIR_PATH = "C:\ZEDO_Data"
+    DEFAULT_READER_NAME = "Snitch"
+    
+    DEFAULT_DIR_PATH = "C:\\ZEDO_Data"
+    
+    DEFAULT_OUTPUT_DIR_PATH = os.path.join(os.path.join(os.path.expanduser("~"), "Downloads"), "Exported_data")
     
     EXPORT_CFG = {
         "export": {
@@ -77,11 +82,8 @@ class ZedoRPC:
         bytes_to_send = json_string.encode('utf-8')    
         self.client_socket.send(bytes_to_send)
         
-        while True:
-            response = self.client_socket.recv(buffer_size)
-            if not response:
-                break
-            response_string += response.decode('utf-8')
+        response = self.client_socket.recv(buffer_size)
+        response_string += response.decode('utf-8')
 
         return response_string
 
@@ -127,7 +129,7 @@ class ZedoRPC:
         except FileNotFoundError:
             ret = False
         return ret
-
+    
     def GetSensors(self, verbosity):
         return self.Call("GetSensors", {'verbosity': verbosity} if verbosity else {})
 
@@ -206,10 +208,9 @@ class ZedoRPC:
     def GetFileReaderData(self, readerId):
         return self.Call("GetFileReaderData", { 'reader_id': readerId})
 
-    def ExportFileReaderData(self, reader_id, outdir, subdir, export_cfg, make_unique_dir = True):
+    def ExportFileReaderData(self, reader_id, outdir, export_cfg, make_unique_dir = True):
         return self.Call("ExportFileReaderData", {
             "path": outdir,
-            "subdir": subdir,
             "unique_subdir": make_unique_dir,
             "reader_id": reader_id,
             "export_cfg": export_cfg
@@ -256,14 +257,59 @@ class ZedoRPC:
     def GetSubItems(self):
         return self.Call("GetSubItems")
     
-    def ExportData(self, Reader_name, dir = DEFAULT_DIR_PATH):
-        readerRespnse = self.OpenFileReaderByName("Reader_name")
+    def Is_RGB_directory(self, path):
+        ret = False
+        try:
+            if os.path.isdir(path):
+                png_path = os.path.join(path, ".png")
+                jpeg_path = os.path.join(path, "jpeg")
+                if os.path.exists(png_path):
+                    ret = os.path.isfile(png_path)
+                elif os.path.exists(jpeg_path):
+                    ret = os.path.isfile(jpeg_path)
+        except FileNotFoundError:
+            ret = False
+        return ret
+    
+    def GetAllMeasurement(self, dir = DEFAULT_DIR_PATH):
+        vysledky = []
+        obsah = os.listdir(dir)
+        for polozka in obsah:
+            cesta = os.path.join(dir, polozka)
+            if os.path.isdir(cesta):
+                Nazev = ""
+                Poradi = 1
+                if len(polozka) == 10 and polozka.count("-") == 2:
+                    Nazev = polozka
+                # Pokud je název složky ve formátu "YYYY-MM-DD-XX"
+                elif len(polozka) == 13:
+                    Nazev = polozka[:10]
+                    poradi_cast = int(polozka[-2:])
+                    Poradi = poradi_cast + 1
+                timestamp = os.path.getctime(cesta)
+                datum_a_cas = datetime.fromtimestamp(timestamp)
+                format_datum_cas = datum_a_cas.strftime("%d.%m.%y %H:%M:%S")
+                IsZdat = self.Is_zdat_directory(cesta)
+                IsCamera = self.Is_RGB_directory(cesta)
+                vysledky.append({
+                "Nazev": polozka,
+                "Datum": format_datum_cas,
+                "Mereni": Nazev,
+                "Poradi": Poradi,
+                "IsAcoustic": IsZdat,
+                "IsCamera": IsCamera  
+                })
+        return vysledky
+        
+    
+    def ExportData(self, Reader_name = DEFAULT_READER_NAME, dir = DEFAULT_DIR_PATH, outputDir = DEFAULT_OUTPUT_DIR_PATH):
+        openedReader = json.loads(self.OpenFileReaderByName(Reader_name))['result']
         if os.path.isdir(dir):
             if self.Is_zdat_directory(dir):
-                data = json.loads(readerRespnse)
-                # response = data['result']
-                reader_id = data['_id'] 
-                self.SetFileReaderPath(reader_id, dir, False)
+                SetFileReaderResp = json.loads(self.SetFileReaderPath(openedReader['_id'], dir, False))
+                readerInfo = json.loads(self.GetFileReaderInfo(openedReader['_id']))['result']
+                ExportInfo = json.loads(self.ExportFileReaderData(readerInfo['reader_id'], outputDir, self.EXPORT_CFG , True))['result']
+                print(ExportInfo)
         # else:
             # Běžný adresář - rekurze do všech podadresářů
             # files = os.listdir(dir)
@@ -273,4 +319,9 @@ class ZedoRPC:
 # Příklad použití třídy
 if __name__ == "__main__":
     print("# Přepis zedo-rpc pro python (nekompletní)\n# Author: David Michalica Team 1, Matěj Prášil Team 2\n# Documentation: https://bitbucket.org/dakel/node-zedo-rpc/src/master/API.md\n# Date: 29.04.2024 MP v0.2")
-    
+    ZedoClient = ZedoRPC()
+    # if not ZedoClient.Is_connected():
+    #     ZedoClient.Connect()
+    # ZedoClient.StartRecording("MyFolder/TestName")
+    # ZedoClient.ExportData()
+    ZedoClient.GetAllMeasurement()
