@@ -316,6 +316,7 @@ class ZedoRPC:
             # for file in files:
             #     process_directory(reader_id, os.path.join(dir, file))
             
+            
 # Příklad použití třídy
 if __name__ == "__main__":
     print("# Přepis zedo-rpc pro python (nekompletní)\n# Author: David Michalica Team 1, Matěj Prášil Team 2\n# Documentation: https://bitbucket.org/dakel/node-zedo-rpc/src/master/API.md\n# Date: 29.04.2024 MP v0.2")

@@ -7,12 +7,14 @@ from database import  engine
 from routes.user_routes import user_api_router
 from routes.camera_routes import camera_api_router
 from routes.acoustic_routes import acoustic_router
+from routes.data_routes import data_router
 
 user_model.Base.metadata.create_all(bind=engine)
 app = FastAPI()
 app.include_router(user_api_router)
 app.include_router(camera_api_router)
 app.include_router(acoustic_router)
+app.include_router(data_router)
 
 origins = ["*"]
 
