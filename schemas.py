@@ -4,6 +4,18 @@ from enum import Enum
 from pydantic import BaseModel
 
 
+class MeasurementType(Enum):
+    acoustic = 'acoustic'
+    rgb = 'rgb'
+    hyperspectral = 'hyperspectral'
+
+
+class MeasurementBase(BaseModel):
+    type: MeasurementType
+    details: str
+    timestamp: str
+
+
 class Role(Enum):
     user = 'user'
     admin = 'admin'
@@ -27,12 +39,14 @@ class User(UserBase):
     class Config:
         from_attributes = True
 
+
 class CameraBase(BaseModel):
     camera_name: str
     sampling_frequency: int
     images_count: int
     camera_activation: int
     measurement_duration: int
+
 
 class Camera(CameraBase):
     id: int
