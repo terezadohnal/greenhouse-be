@@ -28,7 +28,7 @@ def Connect(token: Annotated[str, Depends(oauth2_scheme)]):
 
 @data_router.get("/data/get_data",
                      description="Get all acoustic measurements from DB")
-def Get_data(token: Annotated[str, Depends(oauth2_scheme)], dir):
+def Get_data(token: Annotated[str, Depends(oauth2_scheme)], dir=ZedoClient.DEFAULT_DIR_PATH):
     return ZedoClient.GetAllMeasurement(dir)
 
 
