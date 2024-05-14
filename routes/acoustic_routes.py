@@ -6,6 +6,7 @@ import schemas
 from database import SessionLocal
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
+from typing import Annotated
 
 from routes.acoustic_crud import create_acoustic_measurement, get_acoustic_measurements
 
