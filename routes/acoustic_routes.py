@@ -31,19 +31,20 @@ def Disconnect(token: Annotated[str, Depends(oauth2_scheme)]):
     return ZedoClient.Disconnect()
 
 @acoustic_router.post("/acoustic/start_rec")
-def Start_recording(token: Annotated[str, Depends(oauth2_scheme)], sensor_name: str, record_history_secs: int, measurement_id: int, buffer_size: int):
+def Start_recording(token: Annotated[str, Depends(oauth2_scheme)], measure_name: str = "mereni", record_history_secs: int = 0):
     if not ZedoClient.Is_connected():
         ZedoClient.Connect()
-    return ZedoClient.StartRecording(sensor_name, record_history_secs)
+    return ZedoClient.StartRecording(measure_name, record_history_secs)
+    
 
 @acoustic_router.post("/acoustic/pause_rec")
-def Pause_recording(token: Annotated[str, Depends(oauth2_scheme)], measurement_id: int, buffer_size: int):
+def Pause_recording(token: Annotated[str, Depends(oauth2_scheme)]):
     if not ZedoClient.Is_connected():
         ZedoClient.Connect()
     return ZedoClient.PauseRecording()
 
 @acoustic_router.post("/acoustic/stop_rec")
-def Stop_recording(token: Annotated[str, Depends(oauth2_scheme)], measurement_id: int, buffer_size: int):
+def Stop_recording(token: Annotated[str, Depends(oauth2_scheme)]):
     if not ZedoClient.Is_connected():
         ZedoClient.Connect()
     return ZedoClient.StopRecording()

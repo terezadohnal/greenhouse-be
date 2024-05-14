@@ -157,16 +157,25 @@ class ZedoRPC:
         return self.Call("ClearLiveData")
 
     def StartRecording(self, measurement_name, record_history_secs = 0):
-        return self.Call("StartRecording", {
+        response_str = self.Call("StartRecording", {
             "measurement_name": measurement_name, 
             "record_history_secs": record_history_secs
             })
+        response_dict = json.loads(response_str)
+        result = response_dict["result"]
+        return result
 
     def PauseRecording(self):
-        return self.Call("PauseRecording")
+        response_str = self.Call("PauseRecording")
+        response_dict = json.loads(response_str)
+        result = response_dict["result"]
+        return result
 
     def StopRecording(self):
-        return self.Call("StopRecording")
+        response_str = self.Call("StopRecording")
+        response_dict = json.loads(response_str)
+        result = response_dict["result"]
+        return result
 
     def GetRecordingState(self):
         return self.Call("GetRecordingState")
@@ -319,10 +328,10 @@ class ZedoRPC:
             
 # Příklad použití třídy
 if __name__ == "__main__":
-    print("# Přepis zedo-rpc pro python (nekompletní)\n# Author: David Michalica Team 1, Matěj Prášil Team 2\n# Documentation: https://bitbucket.org/dakel/node-zedo-rpc/src/master/API.md\n# Date: 29.04.2024 MP v0.2")
-    ZedoClient = ZedoRPC()
+    print("# Přepis zedo-rpc pro python (nekompletní)\n# Author: David Michalica Team 1, Matěj Prášil Team 2\n# Documentation: https://bitbucket.org/dakel/node-zedo-rpc/src/master/API.md\n# Date: 14.05.2024 MP v0.3")
+    # ZedoClient = ZedoRPC()
     # if not ZedoClient.Is_connected():
     #     ZedoClient.Connect()
     # ZedoClient.StartRecording("MyFolder/TestName")
     # ZedoClient.ExportData()
-    ZedoClient.GetAllMeasurement()
+    # ZedoClient.GetAllMeasurement()
