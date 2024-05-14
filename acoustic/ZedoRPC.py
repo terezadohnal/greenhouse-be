@@ -2,7 +2,7 @@
 ## Přepis zedo-rpc pro python (nekompletní)
 ## Author: David Michalica Team 1, Matěj Prášil Team 2
 ## Documentation: https://bitbucket.org/dakel/node-zedo-rpc/src/master/API.md
-## Date: 29.04.2024 MP v0.2
+## Date: 14.05.2024 MP v0.3
 #################################################
 
 import socket
@@ -10,6 +10,11 @@ import json
 import os
 from fastapi.responses import JSONResponse
 from datetime import datetime
+import shutil
+import tempfile
+import io
+import zipfile
+
 
 class ZedoRPC:
     
@@ -301,15 +306,30 @@ class ZedoRPC:
                 IsZdat = self.Is_zdat_directory(cesta)
                 IsCamera = self.Is_RGB_directory(cesta)
                 vysledky.append({
-                "Nazev": polozka,
-                "Datum": format_datum_cas,
-                "Mereni": Nazev,
-                "Poradi": Poradi,
-                "IsAcoustic": IsZdat,
-                "IsCamera": IsCamera  
+                "name": polozka,
+                "date": format_datum_cas,
+                "measure": Nazev,
+                "order": Poradi,
+                "isAcoustic": IsZdat,
+                "isCamera": IsCamera  
                 })
         return vysledky
-        
+
+    def DownloadMeasurementData(self, subfolder_name, dir=DEFAULT_DIR_PATH):
+        folder_path = os.path.join(dir, subfolder_name)
+        if os.path.exists(folder_path) and os.path.isdir(folder_path):
+            # Vytvoříme dočasnou paměťovou stránku pro záznamenání zip souboru
+            with io.BytesIO() as temp_memory_zip:
+                with zipfile.ZipFile(temp_memory_zip, mode='w') as zipf:
+                    # Zazipujeme obsah podsložky
+                    for root, dirs, files in os.walk(folder_path):
+                        for file in files:
+                            file_path = os.path.join(root, file)
+                            zipf.write(file_path, os.path.relpath(file_path, folder_path))
+                temp_memory_zip.seek(0)
+                return temp_memory_zip.read()
+        else:
+            return None
     
     def ExportData(self, Reader_name = DEFAULT_READER_NAME, dir = DEFAULT_DIR_PATH, outputDir = DEFAULT_OUTPUT_DIR_PATH):
         openedReader = json.loads(self.OpenFileReaderByName(Reader_name))['result']
