@@ -39,21 +39,17 @@ def Connect():
     response = RGB.captureFakeImage()
     new_photos_length = os.listdir(rgb_output_folder)
     if response and len(new_photos_length) > len(photos_length):
-        print("Image captured")
         try:
             photos = os.listdir(rgb_output_folder)
-            print(photos)
             return photos
         except:
             return 0
     else:
-        print("WAITING FOR IMAGE CAPTURED")
         # wait one two seconds and try again
         time.sleep(2)
         response = RGB.captureFakeImage()
         try:
             photos = os.listdir(rgb_output_folder)
-            print(photos)
             return photos
         except:
             return 0
@@ -73,7 +69,6 @@ async def get_activity_photo(photo_filename: str):
 async def get_activity_photo():
     try:
         photos = os.listdir(rgb_output_folder)
-        print(photos)
         return photos
     except:
         return 0

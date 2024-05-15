@@ -74,7 +74,6 @@ def create_user(db: Session, user: UserCreate):
         last_name=user.last_name,
         role=Role.user.value
     )
-    print(db_user.hashed_password)
 
     db.add(db_user)
     db.commit()
