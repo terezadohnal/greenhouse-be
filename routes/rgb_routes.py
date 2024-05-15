@@ -9,6 +9,7 @@ from fastapi.security import OAuth2PasswordBearer
 from rgb.rgb_controller import RGB
 import os
 from fastapi.responses import FileResponse
+import time
 
 
 rgb_router = APIRouter()
@@ -34,7 +35,28 @@ def Connect():
 
 @rgb_router.post("/rgb/capturefake")
 def Connect():
-    return RGB.captureFakeImage()
+    photos_length = os.listdir(rgb_output_folder)
+    response = RGB.captureFakeImage()
+    new_photos_length = os.listdir(rgb_output_folder)
+    if response and len(new_photos_length) > len(photos_length):
+        print("Image captured")
+        try:
+            photos = os.listdir(rgb_output_folder)
+            print(photos)
+            return photos
+        except:
+            return 0
+    else:
+        print("WAITING FOR IMAGE CAPTURED")
+        # wait one two seconds and try again
+        time.sleep(2)
+        response = RGB.captureFakeImage()
+        try:
+            photos = os.listdir(rgb_output_folder)
+            print(photos)
+            return photos
+        except:
+            return 0
 
 
 @rgb_router.get("/rgb-photos/{photo_filename}")
