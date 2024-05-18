@@ -30,7 +30,11 @@ def Connect(token: Annotated[str, Depends(oauth2_scheme)]):
 def Get_data(token: Annotated[str, Depends(oauth2_scheme)], dir=ZedoClient.DEFAULT_DIR_PATH):
     return ZedoClient.GetAllMeasurement(dir)
 
-@data_router.get("/data/download_data", description="Download one measurement")
+@data_router.get("/data/download_data_FileResponse", description="Download one measurement")
 def Download_data(token: Annotated[str, Depends(oauth2_scheme)],  measurement: str, dir=ZedoClient.DEFAULT_DIR_PATH):
-    return ZedoClient.DownloadMeasurementData(measurement, dir)
+    return ZedoClient.DownloadMeasurementFileResponse(measurement, dir)
+
+@data_router.get("/data/download_data_DataStreaming", description="Download one measurement")
+def Download_data(token: Annotated[str, Depends(oauth2_scheme)],  measurement: str, dir=ZedoClient.DEFAULT_DIR_PATH):
+    return ZedoClient.DownloadMeasurementDataStreaming(measurement, dir)
 

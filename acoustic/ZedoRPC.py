@@ -14,6 +14,8 @@ import shutil
 import tempfile
 import io
 import zipfile
+from fastapi.responses import FileResponse
+from fastapi.responses import StreamingResponse
 
 
 class ZedoRPC:
@@ -311,23 +313,47 @@ class ZedoRPC:
                 "measure": Nazev,
                 "order": Poradi,
                 "isAcoustic": IsZdat,
-                "isCamera": IsCamera  
+                "isCamera": IsCamera
                 })
         return vysledky
 
-    def DownloadMeasurementData(self, subfolder_name, dir=DEFAULT_DIR_PATH):
+    def DownloadMeasurementDataStreaming(self, subfolder_name, dir=DEFAULT_DIR_PATH):
         folder_path = os.path.join(dir, subfolder_name)
         if os.path.exists(folder_path) and os.path.isdir(folder_path):
-            # Vytvoříme dočasnou paměťovou stránku pro záznamenání zip souboru
-            with io.BytesIO() as temp_memory_zip:
-                with zipfile.ZipFile(temp_memory_zip, mode='w') as zipf:
-                    # Zazipujeme obsah podsložky
-                    for root, dirs, files in os.walk(folder_path):
-                        for file in files:
-                            file_path = os.path.join(root, file)
-                            zipf.write(file_path, os.path.relpath(file_path, folder_path))
-                temp_memory_zip.seek(0)
-                return temp_memory_zip.read()
+            # Vytvoříme dočasnou paměťovou stránku pro záznam zip souboru
+            temp_memory_zip = io.BytesIO()
+            with zipfile.ZipFile(temp_memory_zip, mode='w') as zipf:
+                # Zazipujeme obsah podsložky
+                for root, dirs, files in os.walk(folder_path):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        zipf.write(file_path, os.path.relpath(file_path, folder_path))
+            temp_memory_zip.seek(0)
+            response = StreamingResponse(temp_memory_zip, media_type="application/zip")
+            response.headers["Content-Disposition"] = f"attachment; filename={subfolder_name}.zip"
+            return response
+            # response = FileResponse(temp_memory_zip, as_attachment=True, filename=f"{subfolder_name}.zip")
+            # return response
+        else:
+            return None
+        
+    def DownloadMeasurementFileResponse(self, subfolder_name, dir=DEFAULT_DIR_PATH):
+        folder_path = os.path.join(dir, subfolder_name)
+        if os.path.exists(folder_path) and os.path.isdir(folder_path):
+            # Vytvoříme dočasnou paměťovou stránku pro záznam zip souboru
+            temp_memory_zip = io.BytesIO()
+            with zipfile.ZipFile(temp_memory_zip, mode='w') as zipf:
+                # Zazipujeme obsah podsložky
+                for root, dirs, files in os.walk(folder_path):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        zipf.write(file_path, os.path.relpath(file_path, folder_path))
+            temp_memory_zip.seek(0)
+             # Uložíme zip do dočasného souboru
+            with open("/tmp/temp_zip.zip", "wb") as f:
+                f.write(temp_memory_zip.getbuffer())
+
+            return FileResponse("/tmp/temp_zip.zip", filename=f"{subfolder_name}.zip")
         else:
             return None
     
