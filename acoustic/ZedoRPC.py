@@ -2,7 +2,7 @@
 ## Přepis zedo-rpc pro python (nekompletní)
 ## Author: David Michalica Team 1, Matěj Prášil Team 2
 ## Documentation: https://bitbucket.org/dakel/node-zedo-rpc/src/master/API.md
-## Date: 14.05.2024 MP v0.3
+## Date: 18.05.2024 MP v0.4 (nově umožňuje i stažení dat)
 #################################################
 
 import socket
@@ -374,7 +374,7 @@ class ZedoRPC:
             
 # Příklad použití třídy
 if __name__ == "__main__":
-    print("# Přepis zedo-rpc pro python (nekompletní)\n# Author: David Michalica Team 1, Matěj Prášil Team 2\n# Documentation: https://bitbucket.org/dakel/node-zedo-rpc/src/master/API.md\n# Date: 14.05.2024 MP v0.3")
+    print("# Přepis zedo-rpc pro python (nekompletní)\n# Author: David Michalica Team 1, Matěj Prášil Team 2\n# Documentation: https://bitbucket.org/dakel/node-zedo-rpc/src/master/API.md\n# Date: 18.05.2024 MP v0.4 (nově umožňuje i stažení dat)")
     # ZedoClient = ZedoRPC()
     # if not ZedoClient.Is_connected():
     #     ZedoClient.Connect()
