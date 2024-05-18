@@ -19,13 +19,13 @@ def get_db():
     finally:
         db.close()
 
-@rgb_router.post("/rgb/available")
-def Connect():
-    return RGB.isCameraAvailable()
-
-@rgb_router.post("/rgb/capture")
-def Connect():
-    return RGB.captureImage()
+# @rgb_router.post("/rgb/available")
+# def Connect():
+#     return RGB.isCameraAvailable()
+#
+# @rgb_router.post("/rgb/capture")
+# def Connect():
+#     return RGB.captureImage()
 
 @rgb_router.post("/rgb/capturefake")
 def Connect():
