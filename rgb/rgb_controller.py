@@ -54,7 +54,11 @@ class RGB:
             print("Error - camera not found")
 
     def captureFakeImage(folder="rgb/output", number=1):
-        timestamp = datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
-        RGB.returnFakeImage(folder, timestamp)
+        try:
+            timestamp = datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
+            RGB.returnFakeImage(folder, timestamp)
+            return True
+        except Exception as e:
+            print(e)
     
     
