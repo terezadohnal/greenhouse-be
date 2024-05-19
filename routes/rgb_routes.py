@@ -16,7 +16,23 @@ rgb_router = APIRouter()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
+
+def create_folders():
+    # create folders if they do not exist
+    if not os.path.exists("rgb"):
+        os.makedirs("rgb")
+    if not os.path.exists("rgb/output"):
+        os.makedirs("rgb/output")
+
+rbg_folder = "./rgb/"
+# if rgb folder does not exist, create it
+if not os.path.exists(rbg_folder):
+    os.makedirs(rbg_folder)
+
 rgb_output_folder = "./rgb/output/"
+# if rgb output folder does not exist, create it
+if not os.path.exists(rgb_output_folder):
+    os.makedirs(rgb_output_folder)
 
 def get_db():
     db = SessionLocal()
@@ -35,6 +51,7 @@ def Connect():
 
 @rgb_router.post("/rgb/capturefake")
 def Connect():
+    create_folders()
     photos_length = os.listdir(rgb_output_folder)
     response = RGB.captureFakeImage()
     new_photos_length = os.listdir(rgb_output_folder)
@@ -57,6 +74,7 @@ def Connect():
 
 @rgb_router.get("/rgb-photos/{photo_filename}")
 async def get_activity_photo(photo_filename: str):
+    create_folders()
     photo_path = str(rgb_output_folder) + str(photo_filename)
 
     if os.path.isfile(photo_path):
@@ -67,6 +85,7 @@ async def get_activity_photo(photo_filename: str):
 
 @rgb_router.get("/rgb-photos/how-many/")
 async def get_activity_photo():
+    create_folders()
     try:
         photos = os.listdir(rgb_output_folder)
         return photos
