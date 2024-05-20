@@ -4,6 +4,18 @@ from enum import Enum
 from pydantic import BaseModel
 
 
+class MeasurementType(Enum):
+    acoustic = 'acoustic'
+    rgb = 'rgb'
+    hyperspectral = 'hyperspectral'
+
+
+class MeasurementBase(BaseModel):
+    type: MeasurementType
+    details: str
+    timestamp: str
+
+
 class Role(Enum):
     user = 'user'
     admin = 'admin'

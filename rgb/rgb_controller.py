@@ -6,8 +6,19 @@ import random
 from pypylon import pylon
 import platform
 import shutil
+import os
 
+
+# Global variables
 cam = None
+
+rgb_folder = "./rgb/"
+if not os.path.exists(rgb_folder):
+    os.mkdir(rgb_folder)
+
+rgb_output_folder = "./rgb/output/"
+if not os.path.exists(rgb_output_folder):
+    os.mkdir(rgb_output_folder)
 
 class RGB:
 
@@ -56,5 +67,10 @@ class RGB:
     def captureFakeImage(folder="rgb/output", number=1):
         timestamp = datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
         RGB.returnFakeImage(folder, timestamp)
+
+        photos = os.listdir(rgb_output_folder)
+        print(photos)
+        return photos
+
     
     
