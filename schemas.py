@@ -32,6 +32,10 @@ class UserCreate(UserBase):
     password: str
 
 
+class UserUpdate(UserBase):
+    role: Role
+
+
 class User(UserBase):
     id: int
     role: Role
@@ -40,13 +44,16 @@ class User(UserBase):
         from_attributes = True
 
 
+class UserPasswordReset(BaseModel):
+    new_password: str
+
+
 class CameraBase(BaseModel):
     camera_name: str
     sampling_frequency: int
     images_count: int
     camera_activation: int
     measurement_duration: int
-
 
 class Camera(CameraBase):
     id: int
